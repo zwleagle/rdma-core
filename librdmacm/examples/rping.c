@@ -48,7 +48,7 @@
 #include <rdma/rdma_cma.h>
 #include "common.h"
 
-static int debug = 0;
+static int debug = 1;
 #define DEBUG_LOG if (debug) printf
 
 /*

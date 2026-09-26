@@ -64,6 +64,10 @@ else()
 endif()
 project(rdma-core C)
 
+# Generate a compile_commands.json so IDEs can index the project and support
+# Ctrl+Click / Go to Definition navigation.
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # CMake likes to use -rdynamic too much, they fixed it in 3.4.
 if(POLICY CMP0065)
   cmake_policy(SET CMP0065 NEW)
