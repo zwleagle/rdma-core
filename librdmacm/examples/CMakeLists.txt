@@ -42,3 +42,6 @@ target_link_libraries(udaddy LINK_PRIVATE rdmacm rdmacm_tools)
 
 rdma_executable(udpong udpong.c)
 target_link_libraries(udpong LINK_PRIVATE rdmacm rdmacm_tools)
+
+rdma_executable(rping_im rping_im.c)
+target_link_libraries(rping_im LINK_PRIVATE rdmacm ${CMAKE_THREAD_LIBS_INIT} rdmacm_tools)
