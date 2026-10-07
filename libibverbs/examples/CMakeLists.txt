@@ -30,3 +30,6 @@ target_link_libraries(ibv_ud_pingpong LINK_PRIVATE ibverbs ibverbs_tools)
 
 rdma_executable(ibv_xsrq_pingpong xsrq_pingpong.c)
 target_link_libraries(ibv_xsrq_pingpong LINK_PRIVATE ibverbs ibverbs_tools)
+
+rdma_executable(ibv_rc_pingpong_auto_gid rc_pingpong_auto_gid.c)
+target_link_libraries(ibv_rc_pingpong_auto_gid LINK_PRIVATE ibverbs ibverbs_tools)

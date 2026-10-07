@@ -275,7 +275,8 @@ static int client_recv(struct rping_cb *cb, struct ibv_wc *wc)
 		fprintf(stderr, "Received bogus data, size %d\n", wc->byte_len);
 		return -1;
 	}
-
+    DEBUG_LOG("client Received rkey %x addr %" PRIx64 " len %d from peer\n",
+		      be32toh(cb->recv_buf.rkey), be64toh(cb->recv_buf.buf), be32toh(cb->recv_buf.size));
 	if (cb->state == RDMA_READ_ADV)
 		cb->state = RDMA_WRITE_ADV;
 	else
@@ -793,6 +794,20 @@ static int rping_test_server(struct rping_cb *cb)
 			printf("server ping data: %s\n", cb->rdma_buf);
 
 		/* Tell client to continue */
+		/* 1. 将服务器本端的 RDMA 地址信息填充到 send_buf 中 */
+        struct rping_rdma_info *info = (struct rping_rdma_info *)&cb->send_buf;
+        info->buf = htobe64((uintptr_t)cb->rdma_buf);  // 本端 RDMA 缓冲区的虚拟地址 (网络字节序)
+        info->rkey = htobe32(cb->rdma_mr->rkey);       // 本端 RDMA 缓冲区的 rkey (网络字节序)
+        info->size = htobe32(cb->remote_len);          // 本端 RDMA 缓冲区的大小时长
+		/* 2. 清理单边 RDMA 专有字段，防止逻辑混淆 */
+        memset(&cb->sq_wr.wr.rdma, 0, sizeof(cb->sq_wr.wr.rdma));
+		/* 3. 配置双边 SEND Work Request */
+        cb->sq_wr.opcode = IBV_WR_SEND;
+        cb->sq_wr.send_flags = IBV_SEND_SIGNALED;
+		/* 4. SGE 指向包含本端地址信息的 send_buf，长度必须与控制结构体严格对齐 */
+        cb->sq_wr.sg_list->addr = (uintptr_t)&cb->send_buf;
+        cb->sq_wr.sg_list->length = sizeof(struct rping_rdma_info);
+        cb->sq_wr.sg_list->lkey = cb->send_mr->lkey;
 		ret = ibv_post_send(cb->qp, &cb->sq_wr, &bad_wr);
 		if (ret) {
 			fprintf(stderr, "post send error %d\n", ret);

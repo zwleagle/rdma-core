@@ -45,3 +45,9 @@ target_link_libraries(udpong LINK_PRIVATE rdmacm rdmacm_tools)
 
 rdma_executable(rping_im rping_im.c)
 target_link_libraries(rping_im LINK_PRIVATE rdmacm ${CMAKE_THREAD_LIBS_INIT} rdmacm_tools)
+
+rdma_executable(rc_cas_example rc_cas_example.c)
+target_link_libraries(rc_cas_example LINK_PRIVATE rdmacm rdmacm_tools)
+
+rdma_executable(rdma_cm_cas rdma_cm_cas.c)
+target_link_libraries(rdma_cm_cas LINK_PRIVATE rdmacm rdmacm_tools)
